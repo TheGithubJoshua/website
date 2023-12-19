@@ -2,4 +2,8 @@
     font-family: "ssr";
     src: url("https://res.cloudinary.com/blaze-video/raw/upload/v1703002885/Silkscreen-Regular_xerujn.woff2");
   }
+
+  body {
+    font: normal 10px ssr;
+}
   
