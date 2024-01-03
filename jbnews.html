@@ -1,35 +1,107 @@
-
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Reddit JSON Converter</title>
-        <style>
-            ul {
-                list-style-type: none;
-            }
-            li {
-                margin-bottom: 10px;
-                border: 1px solid black;
-                padding: 10px;
-            }
-            a {
-                text-decoration: none;
-                color: black;
-            }
-        </style>
-    </head>
-    <body>
-        <ul id="postList"></ul>
-
-        <script>
+<head>
+    <title>Reddit JSON Converter</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif; /* Whatever font */
+        }
+        ul {
+            list-style-type: none;
+            text-align: middle;
+            padding: 10px;
+            border-radius: 17px; /* Rounded corners */
+            border: 5px solid #ffe599; /* List border thickness */
+            background: linear-gradient(to right, purple, blue); /* Gradient background */
+        }
+        li {
+            margin-bottom: 10px;
+            border: 1px solid black;
+            padding: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        #settingsPane {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background-color: #89CFF0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            display: none;
+        }
+        #toggleSettings {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>r/jailbreak News</h1>
+    
+    <!-- Checkbox elements for choosing flairs -->
+    <label><input type="checkbox" class="flairCheckbox" value="Release"> Release</label>
+    <label><input type="checkbox" class="flairCheckbox" value="News"> News</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Discussion"> Discussion</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Beta"> Beta</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Upcoming"> Upcoming</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Meta"> Meta</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Question"> Question</label>
+    <label><input type="checkbox" class="flairCheckbox" value="Tutorial"> Tutorial</label>
+ 
+    <ul id="postList"></ul>
+ 
+    <!-- Open button for settings pane -->
+    <button id="toggleSettings" onclick="toggleSettingsPane()">Themes</button>
+ 
+    <!-- Settings pane for text color and gradient -->
+    <div id="settingsPane">
+        <label for="textColor">Text Color: </label>
+        <input type="color" id="textColor" onchange="changeTextColor()">
+        
+        <label for="gradientColor1">Background Gradients: </label>
+        <input type="color" id="gradientColor1" onchange="changeGradient()">
+        <input type="color" id="gradientColor2" onchange="changeGradient()">
+        
+        <button id="toggleSettings" type="button" onclick="toggleSettingsPane()">Themes</button>
+        
+        <label for="borderColor">Border:</label>
+        <input type="color" id="borderColor" onchange="changeBorderColor()">
+        
+        <button onclick="exportColorSettings()">Export</button>
+        <button onclick="importColorSettings()">Import</button>
+        
+        <button onclick="toggleEmbeds()">Embeds</button>
+    </div>
+ 
+    <script>
+        // Function to fetch and update posts based on selected flairs
+        function updatePosts() {
+            const postList = document.getElementById('postList');
+            const flairCheckboxes = document.querySelectorAll('.flairCheckbox:checked');
+            const selectedFlairs = Array.from(flairCheckboxes).map(checkbox => checkbox.value);
+ 
+            // Clear existing posts
+            postList.innerHTML = '';
+ 
+            // Fetch new posts and filter based on selected flairs
             fetch('https://www.reddit.com/r/jailbreak/new.json?sort=new')
                 .then(response => response.json())
                 .then(data => {
-                    const postList = document.getElementById('postList');
-                    const desiredFlairs = ['News', 'Release', 'Upcoming', 'Update'];
-
                     data.data.children.forEach(item => {
-                        if (desiredFlairs.includes(item.data.link_flair_text)) {
+                        if (selectedFlairs.includes(item.data.link_flair_text)) {
                             const li = document.createElement('li');
                             const a = document.createElement('a');
                             a.href = 'https://www.reddit.com' + item.data.permalink;
@@ -40,6 +112,140 @@
                     });
                 })
                 .catch(error => console.error('Error:', error));
-        </script>
-    </body>
+        }
+ 
+        // Add event listeners to flair checkboxes
+        const flairCheckboxes = document.querySelectorAll('.flairCheckbox');
+        flairCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updatePosts);
+        });
+ 
+        // Initial update on page load
+        updatePosts();
+ 
+        // Set CSS text color
+        function changeTextColor() {
+            const textColor = document.getElementById('textColor').value;
+            document.querySelectorAll('a').forEach(link => link.style.color = textColor);
+        }
+ 
+        // Set CSS gradient colors
+        function changeGradient() {
+            const gradientColor1 = document.getElementById('gradientColor1').value;
+            const gradientColor2 = document.getElementById('gradientColor2').value;
+            document.querySelector('ul').style.background = `linear-gradient(to right, ${gradientColor1}, ${gradientColor2})`;
+        }
+        
+        // Set CSS border color
+        function changeBorderColor() {
+            const borderColor = document.getElementById('borderColor').value;
+            document.querySelectorAll('ul').forEach(ulElement => ulElement.style.border = `5px solid ${borderColor}`);
+        }
+        
+        // JSON settings export
+        function exportColorSettings() {
+            const textColor = document.getElementById('textColor').value;
+            const gradientColor1 = document.getElementById('gradientColor1').value;
+            const gradientColor2 = document.getElementById('gradientColor2').value;
+            const borderColor = document.getElementById('borderColor').value;
+ 
+            const colorSettings = {
+                textColor,
+                gradientColor1,
+                gradientColor2,
+                borderColor,
+            };
+ 
+            const jsonString = JSON.stringify(colorSettings);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'colorSettings.json';
+            a.click();
+        }
+ 
+        // Import color settings from a text file
+        function importColorSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+ 
+            input.addEventListener('change', (event) => {
+                // Get file from browser and parse JSON content
+                const file = event.target.files[0];
+ 
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const content = e.target.result;
+                        const colorSettings = JSON.parse(content);
+ 
+                        // Set the imported color settings
+                        document.getElementById('textColor').value = colorSettings.textColor;
+                        document.getElementById('gradientColor1').value = colorSettings.gradientColor1;
+                        document.getElementById('gradientColor2').value = colorSettings.gradientColor2;
+                        document.getElementById('borderColor').value = colorSettings.borderColor;
+ 
+                        // Update styles after importing
+                        changeTextColor();
+                        changeGradient();
+                        changeBorderColor();
+                    };
+ 
+                    reader.readAsText(file);
+                }
+            });
+ 
+            input.click();
+        }
+        
+        // Open settings menu
+        function toggleSettingsPane() {
+            const settingsPane = document.getElementById('settingsPane');
+            settingsPane.style.display = settingsPane.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Experimental embeds
+        function toggleEmbeds() {
+            // Append iframe to li
+            alert("This may not work because of Content Security Policies (CSP) on your network or Reddit, continue?")
+            
+            const postList = document.getElementById('postList');
+            const flairCheckboxes = document.querySelectorAll('.flairCheckbox:checked');
+            const selectedFlairs = Array.from(flairCheckboxes).map(checkbox => checkbox.value);
+ 
+            // Clear existing posts
+            postList.innerHTML = '';
+ 
+            // Fetch new posts and filter based on selected flairs
+            fetch('https://www.reddit.com/r/jailbreak/new.json?sort=new')
+                .then(response => response.json())
+                .then(data => {
+                    data.data.children.forEach(item => {
+                        if (selectedFlairs.includes(item.data.link_flair_text)) {
+                            const iframe = document.createElement('iframe');
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = 'https://www.reddit.com' + item.data.permalink;
+                            a.textContent = item.data.title;
+                            // Set iframe attributes
+                            iframe.id = 'reddit-embed';
+                            iframe.src = `https://www.redditmedia.com${item.data.permalink}?ref_source=embed&ref=share&embed=true`;
+                            iframe.sandbox = 'allow-scripts allow-same-origin allow-popups';
+                            iframe.style.border = 'none';
+                            iframe.height = '295';
+                            iframe.width = '640';
+                            iframe.scrolling = 'no';
+                            li.appendChild(iframe);
+                            li.appendChild(a);
+                            postList.appendChild(li);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+<footer>
+    <p>UI made by <a href="https://www.reddit.com/u/whotookthecandyjar/s/iBjqNOCa3e">leafspark </a>
 </html>
