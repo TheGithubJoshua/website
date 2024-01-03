@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Reddit JSON Converter</title>
+        <style>
+            ul {
+                list-style-type: none;
+            }
+            li {
+                margin-bottom: 10px;
+                border: 1px solid black;
+                padding: 10px;
+            }
+            a {
+                text-decoration: none;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="postList"></ul>
+
+        <script>
+            fetch('https://www.reddit.com/r/jailbreak/new.json?sort=new')
+                .then(response => response.json())
+                .then(data => {
+                    const postList = document.getElementById('postList');
+                    const desiredFlairs = ['News', 'Release', 'Upcoming', 'Update'];
+
+                    data.data.children.forEach(item => {
+                        if (desiredFlairs.includes(item.data.link_flair_text)) {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = 'https://www.reddit.com' + item.data.permalink;
+                            a.textContent = item.data.title;
+                            li.appendChild(a);
+                            postList.appendChild(li);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        </script>
+    </body>
+</html>
