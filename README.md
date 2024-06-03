@@ -6,6 +6,8 @@ A perfect motherfucking website.
 
 **VolumeFLEX**
 
+Convenient and fast FLEX.
+
 [Get it on Havoc](https://havoc.app/package/volumeflex)
 
 ## What do I do?
