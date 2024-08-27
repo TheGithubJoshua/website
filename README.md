@@ -10,6 +10,12 @@ Convenient and fast FLEX.
 
 [Get it on Havoc](https://havoc.app/package/volumeflex)
 
+**TrueFocus**
+
+Modern PureFocus remake.
+
+[Buy on Havoc](https://havoc.app/package/truefocus)
+
 ## What do I do?
 
 I mainly make tweaks for jailbroken iOS.
