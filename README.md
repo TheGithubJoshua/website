@@ -25,7 +25,7 @@ I mainly make tweaks for jailbroken iOS.
 [Discord](https://discordapp.com/users/1025137895994044466)
 [Email](mailto:joshua@joshuawhe.online)
 [Github](https://github.com/TheGithubJoshua)
-[Jailbreak Repo](https://repo.joshuawhe.online/)
+[Jailbreak Repo](https://repo.joshuawhe.space/)
 
 ## Donate
 
